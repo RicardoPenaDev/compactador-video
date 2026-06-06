@@ -1,42 +1,63 @@
 # Compactador de Vídeo
 
-Aplicação web local para compactar vídeos MP4 com foco em envio pelo WhatsApp.
+> Aplicação web local para compactar vídeos MP4 com foco em envio pelo WhatsApp.
 
-## O que ele faz
+[![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-Web%20App-black?logo=flask)](https://flask.palletsprojects.com/)
+[![FFmpeg](https://img.shields.io/badge/FFmpeg-Video%20Compression-0078D4)](https://ffmpeg.org/)
+[![Status](https://img.shields.io/badge/Local-100%25%20offline-success)]()
 
-- Processa vídeos **100% localmente**
-- Compacta com **H.264 + AAC**
-- Tenta manter o arquivo em um tamanho amigável para WhatsApp
-- Faz limpeza automática de arquivos temporários
-- Funciona também como executável `.exe` para Windows
+## Visão geral
+
+O **Compactador de Vídeo** foi feito para reduzir vídeos MP4 de forma simples, rápida e totalmente local.
+Ele é útil principalmente para preparar arquivos para compartilhamento no WhatsApp, sem depender de serviços externos.
+
+## Destaques
+
+- Processamento **100% local**
+- Compactação com **H.264 + AAC**
+- Interface simples com **drag and drop**
+- Limpeza automática de arquivos temporários
+- Versão executável `.exe` para Windows
 
 ## Requisitos
+
+Antes de rodar o projeto, você precisa de:
 
 - Python 3.x
 - FFmpeg instalado e disponível no `PATH`
 - Flask
 
-## Instalação
+## Como rodar
+
+Instale a dependência principal:
 
 ```bash
 pip install flask
 ```
 
-## Como rodar
+Inicie a aplicação:
 
 ```bash
 python app.py
 ```
 
-Depois abra:
+Abra no navegador:
 
 ```txt
 http://localhost:5000
 ```
 
+## Como usar
+
+1. Envie ou arraste um arquivo `.mp4`
+2. Clique em **Compress Video**
+3. Aguarde o processamento
+4. Baixe o vídeo compactado
+
 ## Gerar o executável
 
-No Windows, execute:
+No Windows, rode:
 
 ```bat
 build.bat
@@ -48,27 +69,22 @@ O executável será gerado em:
 dist/CompressorVideo.exe
 ```
 
-## Como usar
-
-1. Envie ou arraste um arquivo `.mp4`
-2. Clique em **Compress Video**
-3. Aguarde o processamento
-4. Baixe o vídeo compactado
-
 ## Estrutura do projeto
 
-- `app.py` — backend Flask e compressão com FFmpeg
-- `templates/` — interface web
-- `build.bat` — empacota o `.exe`
-- `uploads/` — arquivos enviados em tempo de execução
-- `output/` — vídeos compactados gerados em tempo de execução
+| Arquivo / pasta | Função |
+|---|---|
+| `app.py` | Backend Flask e lógica de compressão |
+| `templates/` | Interface web |
+| `build.bat` | Geração do executável |
+| `uploads/` | Arquivos enviados em runtime |
+| `output/` | Vídeos compactados gerados em runtime |
 
-## Observações
+## Comportamento esperado
 
-- O alvo é cerca de **64 MB**, mas isso depende do vídeo original.
-- Vídeos muito longos podem continuar maiores do que o desejado.
-- Os arquivos temporários são apagados automaticamente após 30 minutos.
+- O alvo é um arquivo em torno de **64 MB**, mas isso varia conforme o vídeo original.
+- Vídeos muito longos ou complexos podem continuar acima do alvo.
+- Arquivos temporários são limpos automaticamente após 30 minutos.
 
-## Publicação
+## Observação
 
 Este é o único projeto desta pasta que vale ser publicado em modo público no GitHub.
