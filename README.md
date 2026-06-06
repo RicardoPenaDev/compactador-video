@@ -84,7 +84,3 @@ dist/CompressorVideo.exe
 - O alvo é um arquivo em torno de **64 MB**, mas isso varia conforme o vídeo original.
 - Vídeos muito longos ou complexos podem continuar acima do alvo.
 - Arquivos temporários são limpos automaticamente após 30 minutos.
-
-## Observação
-
-Este é o único projeto desta pasta que vale ser publicado em modo público no GitHub.
