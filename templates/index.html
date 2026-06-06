@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Video Compressor</title>
+    <style>
+        :root {
+            --primary: #25D366; /* WhatsApp Green */
+            --dark: #075E54;
+            --light: #DCF8C6;
+            --bg: #ece5dd;
+            --white: #ffffff;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+        
+        .container {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        p.subtitle {
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ccc;
+            padding: 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary);
+            background-color: #f9f9f9;
+        }
+        
+        .upload-area.dragover {
+            border-color: var(--primary);
+            background-color: var(--light);
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+            max-width: 200px;
+        }
+        
+        .btn:hover {
+            background-color: #128C7E;
+        }
+        
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .progress-container {
+            margin-top: 1.5rem;
+            display: none;
+        }
+        
+        .progress-bar-bg {
+            background-color: #eee;
+            border-radius: 10px;
+            height: 10px;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        .progress-bar-fill {
+            background-color: var(--primary);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .status-text {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .results {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .stat-item strong {
+            display: block;
+            color: var(--dark);
+            font-size: 1.1rem;
+        }
+        
+        .download-btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Video Compressor</h1>
+    <p class="subtitle">Optimize MP4 for WhatsApp (~64MB)</p>
+    
+    <div class="upload-area" id="drop-zone">
+        <p>Click or Drag MP4 file here</p>
+        <p id="file-name" style="font-weight: bold; margin-top: 10px; color: var(--dark);"></p>
+        <input type="file" id="file-input" accept="video/mp4">
+    </div>
+    
+    <button id="convert-btn" class="btn" disabled>Compress Video</button>
+    
+    <div class="progress-container" id="progress-container">
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progress-fill"></div>
+        </div>
+        <p class="status-text" id="status-text">Uploading...</p>
+    </div>
+    
+    <div class="results" id="results">
+        <h3>Compression Complete!</h3>
+        <div class="stats">
+            <div class="stat-item">
+                <span>Original</span>
+                <strong id="orig-size">0 MB</strong>
+            </div>
+            <div class="stat-item">
+                <span>Compressed</span>
+                <strong id="comp-size">0 MB</strong>
+            </div>
+            <div class="stat-item">
+                <span>Reduction</span>
+                <strong id="reduction">0%</strong>
+            </div>
+        </div>
+        <a href="#" id="download-link" class="download-btn">Download Video</a>
+        <br><br>
+        <button onclick="location.reload()" style="background:none; border:none; color:#666; cursor:pointer; text-decoration:underline;">Compress another video</button>
+    </div>
+</div>
+
+<script>
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const fileNameDisplay = document.getElementById('file-name');
+    const convertBtn = document.getElementById('convert-btn');
+    const progressContainer = document.getElementById('progress-container');
+    const progressFill = document.getElementById('progress-fill');
+    const statusText = document.getElementById('status-text');
+    const resultsDiv = document.getElementById('results');
+    
+    // Handle File Selection
+    dropZone.addEventListener('click', () => fileInput.click());
+    
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+    
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+            handleFile(e.dataTransfer.files[0]);
+        }
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+        if (fileInput.files.length) {
+            handleFile(fileInput.files[0]);
+        }
+    });
+    
+    function handleFile(file) {
+        if (file.type !== 'video/mp4') {
+            alert('Please select a valid MP4 file.');
+            return;
+        }
+        fileNameDisplay.textContent = file.name;
+        convertBtn.disabled = false;
+        // Reset view
+        resultsDiv.style.display = 'none';
+        progressContainer.style.display = 'none';
+    }
+    
+    // Handle Upload & Convert
+    convertBtn.addEventListener('click', () => {
+        const file = fileInput.files[0] || (dropZone.dataTransfer ? dropZone.dataTransfer.files[0] : null); // Fallback logic simpler in practice using the input
+        
+        // Actually we only need to check fileInput because drop puts it there or we stored it? 
+        // Let's rely on fileInput or a stored variable. simpler:
+        const fileToUpload = fileInput.files[0];
+        
+        if (!fileToUpload) return;
+        
+        convertBtn.disabled = true;
+        progressContainer.style.display = 'block';
+        statusText.textContent = "Uploading 0%";
+        progressFill.style.width = '0%';
+        
+        const formData = new FormData();
+        formData.append('file', fileToUpload);
+        
+        const xhr = new XMLHttpRequest();
+        
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                const percent = (e.loaded / e.total) * 100;
+                progressFill.style.width = percent + '%';
+                statusText.textContent = `Uploading ${Math.round(percent)}%`;
+                
+                if (percent >= 100) {
+                    statusText.textContent = "Processing video... This may take a while.";
+                }
+            }
+        });
+        
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    showResults(response);
+                } else {
+                    statusText.textContent = "Error: " + (JSON.parse(xhr.responseText).error || "Unknown error");
+                    statusText.style.color = "red";
+                    convertBtn.disabled = false;
+                }
+            }
+        };
+        
+        xhr.open('POST', '/upload', true);
+        xhr.send(formData);
+    });
+    
+    function showResults(data) {
+        progressContainer.style.display = 'none';
+        resultsDiv.style.display = 'block';
+        
+        document.getElementById('orig-size').textContent = data.original_size;
+        document.getElementById('comp-size').textContent = data.compressed_size;
+        document.getElementById('reduction').textContent = data.reduction;
+        
+        const link = document.getElementById('download-link');
+        link.href = data.download_url;
+        link.download = ''; // Let browser handle name or use header
+    }
+</script>
+
+</body>
+</html>
